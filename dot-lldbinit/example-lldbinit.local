@@ -1,0 +1,1 @@
+script __lldbinit__.Options.syntax = "intel"

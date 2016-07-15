@@ -1,0 +1,16 @@
+# default settings
+settings set target.load-cwd-lldbinit true
+
+# some default modules
+script import user,types,lldb
+
+script import lldb.macosx.heap
+# load all the functions declared in .lldbinit.py
+script __lldbinit__ = types.ModuleType('__lldbinit__')
+script execfile(os.path.join(user.home, '.lldbinit.py'), __lldbinit__.__dict__, __lldbinit__.__dict__)
+script __lldbinit__.__lldb_init_module(lldb.debugger or lldb.SBDebugger.Create(), globals())
+
+# source a user-local .lldbinit
+script os.path.exists(os.path.join(user.home, '.lldbinit.local')) and lldb.debugger.HandleCommand('command source -- {:s}'.format(os.path.join(user.home, '.lldbinit.local'))) and 0 or None
+settings set target.x86-disassembly-flavor intel
+script lldb.target

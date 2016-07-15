@@ -1,0 +1,16 @@
+script import sys
+script sys.path.extend(('lib','scripts'))
+
+script import ptypes,macheap
+script import ptypes.bitmap as bit
+script ptypes.setsource(ptypes.prov.lldb(lldb.process))
+
+script import onemag
+breakpoint set -N singlemag1 -s libsystem_malloc.dylib -a 0x262a
+breakpoint set -N singlemag2 -s libsystem_malloc.dylib -a 0x2a6a
+breakpoint set -N singlemag3 -s libsystem_malloc.dylib -a 0xb95d
+breakpoint set -N singlemag4 -s libsystem_malloc.dylib -a 0xbd43
+breakpoint command add -F onemag.to singlemag1
+breakpoint command add -F onemag.rule singlemag2
+breakpoint command add -F onemag.them singlemag3
+breakpoint command add -F onemag.all singlemag4
