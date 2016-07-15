@@ -1,0 +1,23 @@
+all: \
+	cache-test \
+	core_migration \
+	core-stable \
+	core-test \
+	free-list-test \
+	new-region \
+	overflow \
+	predict \
+	region-cache \
+	region-free \
+	region-free-coalesce \
+	small-slot-multi \
+	small-slot-multi-frag \
+	small-slot-single \
+	timeslice-blocking \
+	timeslice-nonblocking \
+	tiny-slot-metafree \
+	tiny-slot-multi \
+	tiny-slot-multi-frag \
+	tiny-slot-single
+	@echo "[*] Finished building all testcases"
+
