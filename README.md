@@ -54,7 +54,7 @@ Python Interactive Interpreter. To exit, type 'quit()', 'exit()' or Ctrl-D.
 ```
 ***t*** now holds an array of tiny magazines from the default zone 
 
-Note: all allocations were forced into the first magazine with malloc breakpoints using com.py available in the repo
+Note: all allocations were forced into the first magazine with malloc breakpoints using onemag.py available in the repo
 ```
 >>> t[1]
 <class macheap.magazine_t> '1' {magazine_size='tiny'}
