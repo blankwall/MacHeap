@@ -1439,12 +1439,6 @@ class mem_prot(DebuggerCommand):
 
 @Command('dsearch')
 class dsearch(DebuggerCommand):
-    help = argparse.ArgumentParser(prog='dsearch', description='search disassembly')
-    help.add_argument('-n/s', action='store', default=['-n'], help='how to disassemble address or name')
-    help.add_argument('expression', action='store', default=[], help='expression to disassemble from - ie. main, $pc')
-    help.add_argument('search', action='store', default=[], help='what to search for')
-    help.add_argument('[extras]', action='store', default=[], help='extra arguments to pass to disassemgble ie line count: -c 100')
-
     context = lldb.SBFrame
 
     @classmethod
