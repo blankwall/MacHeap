@@ -23,6 +23,7 @@ Commands
  - ls - effective symbol lookup
  - bdisas - disassemble backwards from $pc
  - h - display current context
+ - dsearch - search through disassembly 
  - more...
 
 Example
@@ -106,4 +107,13 @@ Example
 7fff5fbffad0 |         0.000000         0.000000 27667987456052953088.000000         0.000000            | ........8.._....
 7fff5fbffae0 |         0.000000         0.000000 27668075416983175168.000000         0.000000            | ........`.._....
 7fff5fbffaf0 | 27668242542750597120.000000         0.000000 27668273329076174848.000000         0.000000 | ..._......._....
+```
+
+View all calls in first 8 instructions of function named main
+-s allows you to disassemble from an expression
+```
+(lldb) dsearch -n main call -c 8
+new-region`main:
+->  0x100000f60 <+16>: call   0x100000ed0               ; initialize_tiny_region
+    0x100000f66 <+22>: call   0x100000f10               ; initialize_small_region
 ```
