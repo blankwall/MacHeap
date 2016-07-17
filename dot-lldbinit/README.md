@@ -21,10 +21,48 @@ Commands
  - p - to print using full expression parser 
  - lm - effective module listing 
  - ls - effective symbol lookup
+ - bdisas - disassemble backwards from $pc
+ - h - display current context
  - more...
 
 Example
 -------
+
+```
+(lldb) h
+-=[registers]=-
+[rax: 0x0000000100000f50] [rbx: 0x0000000000000000] [rcx: 0x00007fff5fbffbd8]
+[rdx: 0x00007fff5fbffae8] [rsi: 0x00007fff5fbffad8] [rdi: 0x0000000000000001]
+[rsp: 0x00007fff5fbffaa0] [rbp: 0x00007fff5fbffab0] [ pc: 0x0000000100000f60]
+[ r8: 0x0000000000000000] [ r9: 0x00007fff742760c8] [r10: 0x00000000ffffffff]
+[r11: 0xffffffff00000000] [r12: 0x0000000000000000] [r13: 0x0000000000000000]
+[r14: 0x0000000000000000] [r15: 0x0000000000000000] [efl: 0x0000000000000206]
+[rflags: 00000000 NZ NS NO NC ND NI]
+
+-=[stack]=-
+7fff5fbffaa0 | 00007fff5fbffac8 000000005fc01036 | ..._....6.._....
+7fff5fbffab0 | 00007fff5fbffac8 00007fff909e45ad | ..._.....E......
+7fff5fbffac0 | 00007fff909e45ad 0000000000000000 | .E..............
+7fff5fbffad0 | 0000000000000001 00007fff5fbffc38 | ........8.._....
+
+-=[disassembly]=-
+    0x100000f54 <+4>:  sub    rsp, 0x10
+    0x100000f58 <+8>:  mov    dword ptr [rbp - 0x4], 0x0
+    0x100000f5f <+15>: int3
+->  0x100000f60 <+16>: call   0x100000ed0               ; initialize_tiny_region
+    0x100000f65 <+21>: int3
+    0x100000f66 <+22>: call   0x100000f10               ; initialize_small_region
+    0x100000f6b <+27>: int3
+```
+
+```
+(lldb) bdisas 4
+    0x100000f51 <+1>:  mov    rbp, rsp
+    0x100000f54 <+4>:  sub    rsp, 0x10
+    0x100000f58 <+8>:  mov    dword ptr [rbp - 0x4], 0x0
+    0x100000f5f <+15>: int3
+->  0x100000f60 <+16>: call   0x100000ed0               ; initialize_tiny_region
+```
 
 ```
 (lldb) p poi($rax+10)
@@ -58,4 +96,14 @@ Example
 [6] libsystem_malloc.dylib`printf type=5 0x7fff98a954cc:+0x6
 [7] libauto.dylib`printf type=5 0x7fff88b6e15a:+0x6
 [8] libobjc.A.dylib`printf type=5 0x7fff8d302ec6:+0x6
+```
+
+```
+(lldb) df $rsp
+7fff5fbffaa0 | 27667178215494909952.000000         0.000000 27679242057074868224.000000         0.000000 | ..._....6.._....
+7fff5fbffab0 | 27667178215494909952.000000         0.000000        -0.000000         0.000000            | ..._.....E......
+7fff5fbffac0 |        -0.000000         0.000000         0.000000         0.000000                       | .E..............
+7fff5fbffad0 |         0.000000         0.000000 27667987456052953088.000000         0.000000            | ........8.._....
+7fff5fbffae0 |         0.000000         0.000000 27668075416983175168.000000         0.000000            | ........`.._....
+7fff5fbffaf0 | 27668242542750597120.000000         0.000000 27668273329076174848.000000         0.000000 | ..._......._....
 ```
