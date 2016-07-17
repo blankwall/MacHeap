@@ -20,6 +20,7 @@ class Options(object):
     # FIXME: allow better customization
     here_rows = 4, 6
     hex_rows = 6
+    rows = 6
 
     forward_disassembly = 4
     backward_disassembly =3
@@ -1007,11 +1008,11 @@ class Target(object):
 
     @classmethod
     def itemdump(cls, target, address, count, kind, width=16):
-        return '\n'.join(map(' | '.join, cls._dump(target, address, count, width, kind, cls._itemdump)))
+        return '\n'.join(map(' | '.join, cls._dump(target, address, count*width, width, kind, cls._itemdump)))
 
     @classmethod
     def binarydump(cls, target, address, count, kind, width=16):
-        return '\n'.join(map(' | '.join, cls._dump(target, address, count, width, kind, cls._bindump)))
+        return '\n'.join(map(' | '.join, cls._dump(target, address, count*width, width, kind, cls._bindump)))
 
 class Breakpoint(object):
     cache = {}          # unique id number to breakpoint/watchpoint name
@@ -1438,18 +1439,29 @@ class mem_prot(DebuggerCommand):
 
 @Command('dsearch')
 class dsearch(DebuggerCommand):
+    help = argparse.ArgumentParser(prog='dsearch', description='search disassembly')
+    help.add_argument('-n/s', action='store', default=['-n'], help='how to disassemble address or name')
+    help.add_argument('expression', action='store', default=[], help='expression to disassemble from - ie. main, $pc')
+    help.add_argument('search', action='store', default=[], help='what to search for')
+    help.add_argument('[extras]', action='store', default=[], help='extra arguments to pass to disassemgble ie line count: -c 100')
+
     context = lldb.SBFrame
 
     @classmethod
     def command(cls, frame, args):
         if len(args) < 3:
             return
-        res = cls.result
+        #FIXME
+        # res = cls.result
+        res = lldb.SBCommandReturnObject()
         tipe = args[0]
-        expression = args[1]
+        if tipe == 's':
+            Target.evaluate(target, args[1])
+        else:
+            expression = args[1]
         word = args[2]
         try:
-            extra = args[3]
+            extra = ' '.join(args[3:])
         except IndexError:
             extra = ""  
         x = "disassemble " + tipe + " " + expression + " -F " + Options.syntax + " " + extra
@@ -1459,8 +1471,44 @@ class dsearch(DebuggerCommand):
             if  not re.search(r'\d', i) or word in i:
                 print i
 
+@Command('bdisas')
+class bdisas(DebuggerCommand):
+    # help = argparse.ArgumentParser(prog='bdisas', description='disassemble backwards from pc')
+    # help.add_argument('address', action='store', type=int, nargs=1, default=None, help='address or expression to query')
+
+    context = lldb.SBTarget
+
+    @staticmethod
+    def command(target, args):
+        if len(args) == 1:
+            distance = int(args[0])
+        else:
+            distance = Options.backward_disassembly
+
+
+        res = lldb.SBCommandReturnObject();
+        lldb.debugger.GetCommandInterpreter().HandleCommand("disassemble -f -F {:s}".format(Options.syntax), res);
+        x = res.GetOutput().split("\n")
+        count = 0
+        back =distance
+        for i in x:
+            if "->" in i:
+                break
+            count += 1
+
+        for i in range(count-back, count+1):
+            try:
+                print x[i]
+            except:
+                continue
+
+
+
 @Command('history')
 class history(DebuggerCommand):
+    help = argparse.ArgumentParser(prog='history', description='malloc_history for an address')
+    help.add_argument('address', action='store', type=int, nargs=1, default=None, help='address or expression to query')
+
     context = lldb.SBTarget
 
     @staticmethod
@@ -1473,11 +1521,16 @@ class history(DebuggerCommand):
         os.system("malloc_history {0} {1}".format(pid, hex(address)))
 
 @Command('p')
-class eval(DebuggerCommand):
+class p(DebuggerCommand):
+    help = argparse.ArgumentParser(prog='p', description='print using expression parser')
+    help.add_argument('expression', action='store', default='$sp', nargs='+',help='address expression')
+
     context = lldb.SBTarget
 
     @staticmethod
     def command(target, args):
+        if len(args) < 1:
+            return
         res = Target.evaluate(target, ''.join(args))
         # FIXME: display all possible output formats like in pcalc
         print '{:d} -- 0x{:x}'.format(res, res)
@@ -1502,8 +1555,8 @@ class itemdump(DebuggerCommand):
 
     @classmethod
     def command(cls, target, args):
-        count = Options.rows if args.count is None else args.count
-        expr = Target.evaluate(t, ''.join(args.expression))
+        count = Options.rows if args.count is None else args.count[0]
+        expr = Target.evaluate(target, ''.join(args.expression))
         print Target.itemdump(target, expr, count, cls.kind)
 
 class binarydump(DebuggerCommand):
@@ -1515,8 +1568,8 @@ class binarydump(DebuggerCommand):
 
     @classmethod
     def command(cls, target, args):
-        count = Options.rows if args.count is None else args.count
-        expr = Target.evaluate(t, ''.join(args.expression))
+        count = Options.rows if args.count is None else args.count[0]
+        expr = Target.evaluate(target, ''.join(args.expression))
         print Target.binarydump(target, expr, count, cls.kind)
 
 # FIXME: fix up the help documentation for each of these
