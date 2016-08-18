@@ -1474,9 +1474,12 @@ class bdisas(DebuggerCommand):
 
     @staticmethod
     def command(target, args):
-        if len(args) == 1:
-            distance = int(args[0])
-        else:
+        try:
+            if len(args) == 1:
+                distance = int(args[0])
+            else:
+                distance = Options.backward_disassembly
+        except:
             distance = Options.backward_disassembly
 
 
