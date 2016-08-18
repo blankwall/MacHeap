@@ -1500,8 +1500,8 @@ class bdisas(DebuggerCommand):
 
 @Command('history')
 class history(DebuggerCommand):
-    help = argparse.ArgumentParser(prog='history', description='malloc_history for an address')
-    help.add_argument('address', action='store', type=int, nargs=1, default=None, help='address or expression to query')
+    #help = argparse.ArgumentParser(prog='history', description='malloc_history for an address')
+    #help.add_argument('address', action='store', type=int, nargs=1, default=None, help='address or expression to query')
 
     context = lldb.SBTarget
 
@@ -1516,8 +1516,8 @@ class history(DebuggerCommand):
 
 @Command('p')
 class p(DebuggerCommand):
-    help = argparse.ArgumentParser(prog='p', description='print using expression parser')
-    help.add_argument('expression', action='store', default='$sp', nargs='+',help='address expression')
+    #help = argparse.ArgumentParser(prog='p', description='print using expression parser')
+    #help.add_argument('expression', action='store', default='$sp', nargs='+',help='address expression')
 
     context = lldb.SBTarget
 
