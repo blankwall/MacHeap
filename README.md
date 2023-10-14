@@ -1,5 +1,10 @@
 #MacHeap
 
+License
+-----
+
+All contents of this repository are licensed under GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
+
 About
 -----
 MacHeap is a LLDB Python script for use with OS X heap introspection. All heap structures are parsed and presented as Python objects accessible via dictionaries. This allows full understanding and representation of the internal heap state and structures of the default malloc on OS X. More documentation will be added in the future. Also check out the IDB directory for the marked up default malloc IDB with full structures and the LLDB init directory for a unique, featureful, and easily extensible LLDB init script.
